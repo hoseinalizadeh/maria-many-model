@@ -32,4 +32,5 @@ def parse_args(args=None):
 
 if __name__ == "__main__":
     args = parse_args()
-    download_data(target_path=args.path, maxfiles=args.maxfiles)
+    datapath = download_data(target_path=args.path, maxfiles=args.maxfiles)
+    print(datapath)
