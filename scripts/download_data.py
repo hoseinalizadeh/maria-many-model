@@ -24,9 +24,15 @@ def download_data(target_path, maxfiles=None):
 
 def parse_args(args=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", type=str, default='oj_sales_data')
-    parser.add_argument("--maxfiles", type=int, default=None)
+    parser.add_argument("--path", type=str)
+    parser.add_argument("--maxfiles", type=int)
     args_parsed = parser.parse_args(args)
+
+    if args_parsed.path is None:
+        args_parsed.path = 'oj_sales_data{suffix}'.format(
+            suffix = '_{}'.format(args_parsed.maxfiles) if args_parsed.maxfiles else ''
+        )
+
     return args_parsed
 
 
