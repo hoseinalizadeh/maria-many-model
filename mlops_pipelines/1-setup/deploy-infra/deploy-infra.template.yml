@@ -1,0 +1,23 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+# Azure Pipeline Template for ML Workspace Resources Deployment
+
+parameters:
+- name: serviceConnection
+  type: string
+
+jobs:
+
+- job: test_vars
+  displayName: 'Test Variables'
+  steps:
+  - task: AzureCLI@1
+    displayName: 'Test Variables'
+    inputs:
+      azureSubscription: '${{parameters.serviceConnection}}'
+      scriptLocation: inlineScript
+      inlineScript: |
+        echo ${{parameters.serviceConnection}}
+        echo $NAMESPACE
+        echo $WORKSPACE_NAME

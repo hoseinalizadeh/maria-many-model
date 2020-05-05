@@ -1,0 +1,11 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+# Azure Pipeline Template for ML Workspace Setup
+
+jobs:
+
+- job: sample_job
+  displayName: 'Sample Job'
+  steps:
+  - script: echo "sample job"
