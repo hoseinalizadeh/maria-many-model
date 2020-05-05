@@ -4,20 +4,46 @@
 # Azure Pipeline Template for ML Workspace Resources Deployment
 
 parameters:
+- name: environment
+  type: string
 - name: serviceConnection
+  type: string
+- name: resourceGroup
+  type: string
+- name: resourcesLocation
+  type: string
+- name: storageAccountName
   type: string
 
 jobs:
 
-- job: test_vars
-  displayName: 'Test Variables'
+- job: iac_build
+  displayName: 'IaC Build'
   steps:
-  - task: AzureCLI@1
-    displayName: 'Test Variables'
+  - task: CopyFiles@2
+    displayName: 'Copy ARM templates'
     inputs:
-      azureSubscription: '${{parameters.serviceConnection}}'
-      scriptLocation: inlineScript
-      inlineScript: |
-        echo ${{parameters.serviceConnection}}
-        echo $NAMESPACE
-        echo $WORKSPACE_NAME
+      sourceFolder: 'mlops_pipelines/1-setup/deploy-infra/arm-templates'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+  - publish: '$(Build.ArtifactStagingDirectory)'
+    artifact: infratemplates
+
+
+- deployment: DeployAMLResources
+  displayName: Deploy AML Resources
+  environment: ${{parameters.environment}}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - download: current
+          artifact: infratemplates
+        - task: AzureResourceGroupDeployment@2
+          displayName: 'Deploy Storage Account'
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            resourceGroupName: ${{parameters.resourceGroup}}
+            location: ${{parameters.resourcesLocation}}
+            csmFile: '$(Pipeline.Workspace)/infratemplates/storage/template.json'
+            csmParametersFile: '$(Pipeline.Workspace)/infratemplates/storage/parameters.json'
+            overrideParameters: '-name ${{parameters.storageAccountName}} -location ${{parameters.resourcesLocation}}'

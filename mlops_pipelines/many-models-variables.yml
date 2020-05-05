@@ -5,6 +5,10 @@
 
 variables:
 
+  # General
+  - name: ENVIRONMENT
+    value: DEV
+
   # Infra
   - name: WORKSPACE_NAME
     value: $(NAMESPACE)aml

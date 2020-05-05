@@ -24,7 +24,11 @@ stages:
   jobs:
   - template: deploy-infra/deploy-infra.template.yml
     parameters:
+      environment: '$(ENVIRONMENT)'
       serviceConnection: '$(SERVICECONNECTION_GROUP)'
+      resourceGroup: '$(RESOURCE_GROUP)'
+      resourcesLocation: '$(LOCATION)'
+      storageAccountName: '$(STORAGEACCOUNT_NAME)'
 
 - stage: environment_setup
   displayName: 'Environment Setup'
