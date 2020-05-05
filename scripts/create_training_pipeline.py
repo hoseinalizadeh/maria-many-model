@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+import pathlib
 import argparse
 from azureml.core import Workspace, Experiment, Dataset, Environment
 from azureml.core.conda_dependencies import CondaDependencies
@@ -69,8 +70,9 @@ def get_parallel_run_config(ws, dataset_name, compute_name="cpu-compute", proces
     }
 
     # Set up ParallelRunStep configuration
+    scripts_dir = pathlib.Path(__file__).parent.absolute().__str__()
     parallel_run_config = ParallelRunConfig(
-        source_directory='./scripts',
+        source_directory=scripts_dir,
         entry_script='train.py',
         mini_batch_size="1",
         run_invocation_timeout=timeout,
