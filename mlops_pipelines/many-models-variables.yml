@@ -10,7 +10,7 @@ variables:
     value: DEV
 
   # Infra
-  - name: WORKSPACE_NAME
+  - name: AMLWORKSPACE_NAME
     value: $(NAMESPACE)aml
   - name: STORAGEACCOUNT_NAME
     value: $(NAMESPACE)sa

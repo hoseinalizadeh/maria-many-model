@@ -29,6 +29,10 @@ stages:
       resourceGroup: '$(RESOURCE_GROUP)'
       resourcesLocation: '$(LOCATION)'
       storageAccountName: '$(STORAGEACCOUNT_NAME)'
+      keyVaultName: '$(KEYVAULT_NAME)'
+      appInsightsName: '$(APPINSIGHTS_NAME)'
+      containerRegistryName: '$(CONTAINERREGISTRY_NAME)'
+      amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
 
 - stage: environment_setup
   displayName: 'Environment Setup'
