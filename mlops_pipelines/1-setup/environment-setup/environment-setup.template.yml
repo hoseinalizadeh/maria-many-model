@@ -36,10 +36,12 @@ jobs:
 - job: sample_files
   displayName: 'Sample Files Setup'
   steps:
+
     - task: UsePythonVersion@0
       displayName: 'Use Python 3.7'
       inputs:
         versionSpec: 3.7
+    
     - bash: |
         # Install dependencies
         python -m pip install --upgrade pip && python -m pip install azureml-opendatasets
@@ -49,4 +51,19 @@ jobs:
         echo "##vso[task.setvariable variable=datapath;]$datapath"
       displayName: 'Download Sample Files'
       failOnStderr: true
-  
+    
+    - task: AzureCLI@1
+      displayName: 'Upload files to AML datastore'
+      inputs:
+        azureSubscription: ${{parameters.serviceConnection}}
+        scriptLocation: inlineScript
+        inlineScript: |
+          # Install ML extension
+          az extension add -n azure-cli-ml
+          # Set default workspace
+          az ml folder attach -w ${{parameters.amlWorkspaceName}} -g ${{parameters.resourceGroup}}
+          # Get default datastore
+          datastore=$(az ml datastore show-default --query name -o tsv)
+          # Upload files
+          az ml datastore upload --name $datastore --src-path $DATAPATH --target-path $DATAPATH --overwrite true
+        failOnStandardError: true
