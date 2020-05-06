@@ -38,3 +38,9 @@ stages:
   displayName: 'Environment Setup'
   jobs:
   - template: environment-setup/environment-setup.template.yml
+    parameters:
+      serviceConnection: '$(SERVICECONNECTION_GROUP)'
+      resourceGroup: '$(RESOURCE_GROUP)'
+      resourcesLocation: '$(LOCATION)'
+      amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
+      amlComputeName: '$(AML_COMPUTE_NAME)'

@@ -3,9 +3,31 @@
 
 # Azure Pipeline Template for ML Workspace Setup
 
+parameters:
+- name: serviceConnection
+  type: string
+- name: resourceGroup
+  type: string
+- name: resourcesLocation
+  type: string
+- name: amlWorkspaceName
+  type: string
+- name: amlComputeName
+  type: string
+
+
 jobs:
 
-- job: sample_job
-  displayName: 'Sample Job'
+- job: aml_compute
+  displayName: 'Deploy AML Compute'
   steps:
-  - script: echo "sample job"
+  - task: AzureResourceGroupDeployment@2
+    displayName: 'Deploy AML Compute'
+    inputs:
+      azureSubscription: ${{parameters.serviceConnection}}
+      resourceGroupName: ${{parameters.resourceGroup}}
+      location: ${{parameters.resourcesLocation}}
+      csmFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.template.json'
+      csmParametersFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.parameters.json'
+      overrideParameters: '-workspaceName ${{parameters.amlWorkspaceName}} -clusterName ${{parameters.amlComputeName}}'
+

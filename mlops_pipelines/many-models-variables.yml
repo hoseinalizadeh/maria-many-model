@@ -22,7 +22,7 @@ variables:
     value: $(NAMESPACE)cr
 
   # Azure ML workspace
-  - name: COMPUTE_NAME
+  - name: AML_COMPUTE_NAME
     value: cpu-compute
 
   # # Source Config

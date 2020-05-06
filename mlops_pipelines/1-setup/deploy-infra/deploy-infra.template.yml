@@ -37,7 +37,6 @@ jobs:
   - publish: '$(Build.ArtifactStagingDirectory)'
     artifact: infratemplates
 
-
 - deployment: iac_deployment
   displayName: 'IaC Deployment'
   environment: ${{parameters.environment}}
