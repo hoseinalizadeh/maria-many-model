@@ -14,24 +14,26 @@ parameters:
   type: string
 - name: amlComputeName
   type: string
+- name: amlDatasetName
+  type: string
 - name: maxFiles
   type: string
 
 
 jobs:
 
-# - job: aml_compute
-#   displayName: 'Deploy AML Compute'
-#   steps:
-#   - task: AzureResourceGroupDeployment@2
-#     displayName: 'Deploy AML Compute'
-#     inputs:
-#       azureSubscription: ${{parameters.serviceConnection}}
-#       resourceGroupName: ${{parameters.resourceGroup}}
-#       location: ${{parameters.resourcesLocation}}
-#       csmFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.template.json'
-#       csmParametersFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.parameters.json'
-#       overrideParameters: '-workspaceName ${{parameters.amlWorkspaceName}} -clusterName ${{parameters.amlComputeName}}'
+- job: aml_compute
+  displayName: 'Deploy AML Compute'
+  steps:
+  - task: AzureResourceGroupDeployment@2
+    displayName: 'Deploy AML Compute'
+    inputs:
+      azureSubscription: ${{parameters.serviceConnection}}
+      resourceGroupName: ${{parameters.resourceGroup}}
+      location: ${{parameters.resourcesLocation}}
+      csmFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.template.json'
+      csmParametersFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.parameters.json'
+      overrideParameters: '-workspaceName ${{parameters.amlWorkspaceName}} -clusterName ${{parameters.amlComputeName}}'
 
 - job: sample_files
   displayName: 'Sample Files Setup'
@@ -47,10 +49,14 @@ jobs:
         python -m pip install --upgrade pip && python -m pip install azureml-opendatasets
         # Download sample files
         datapath=$(python scripts/download_data.py --maxfiles ${{parameters.maxFiles}})
-        # Save datapath variable for next steps
-        echo "##vso[task.setvariable variable=datapath;]$datapath"
+        echo "##vso[task.setvariable variable=datapath;isOutput=true;]$datapath"
+      name: download_files
       displayName: 'Download Sample Files'
       failOnStderr: true
+    
+    - bash: | 
+        echo Datapath: $(download_files.datapath)
+      name: echotask
     
     - task: AzureCLI@1
       displayName: 'Upload files to AML datastore'
@@ -65,5 +71,31 @@ jobs:
           # Get default datastore
           datastore=$(az ml datastore show-default --query name -o tsv)
           # Upload files
-          az ml datastore upload --name $datastore --src-path $DATAPATH --target-path $DATAPATH --overwrite true
-        failOnStandardError: true
+          az ml datastore upload --name $datastore --src-path $(download_files.datapath) --target-path $(download_files.datapath) --overwrite true
+
+- job: register_dataset
+  displayName: 'Register Dataset'
+  dependsOn: sample_files
+  variables: 
+    datapath: $[ dependencies.sample_files.outputs['download_files.datapath'] ]
+  steps:
+
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.7'
+      inputs:
+        versionSpec: 3.7
+
+    - task: AzureCLI@1
+      displayName: 'Register dataset'
+      inputs:
+        azureSubscription: ${{parameters.serviceConnection}}
+        scriptLocation: inlineScript
+        inlineScript: |
+          # Install dependencies
+          python -m pip install --upgrade pip && python -m pip install azureml-sdk
+          # Register dataset
+          python scripts/register_dataset.py --path $DATAPATH \
+                                             --name ${{parameters.amlDatasetName}} \
+                                             --subscription-id $(az account show --query id -o tsv) \
+                                             --resource-group ${{parameters.resourceGroup}} \
+                                             --workspace-name ${{parameters.amlWorkspaceName}}
