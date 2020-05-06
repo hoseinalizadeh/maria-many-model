@@ -19,20 +19,20 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
-- stage: deploy_infra
-  displayName: 'Deploy Infra'
-  jobs:
-  - template: deploy-infra/deploy-infra.template.yml
-    parameters:
-      environment: '$(ENVIRONMENT)'
-      serviceConnection: '$(SERVICECONNECTION_GROUP)'
-      resourceGroup: '$(RESOURCE_GROUP)'
-      resourcesLocation: '$(LOCATION)'
-      storageAccountName: '$(STORAGEACCOUNT_NAME)'
-      keyVaultName: '$(KEYVAULT_NAME)'
-      appInsightsName: '$(APPINSIGHTS_NAME)'
-      containerRegistryName: '$(CONTAINERREGISTRY_NAME)'
-      amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
+# - stage: deploy_infra
+#   displayName: 'Deploy Infra'
+#   jobs:
+#   - template: deploy-infra/deploy-infra.template.yml
+#     parameters:
+#       environment: '$(ENVIRONMENT)'
+#       serviceConnection: '$(SERVICECONNECTION_GROUP)'
+#       resourceGroup: '$(RESOURCE_GROUP)'
+#       resourcesLocation: '$(LOCATION)'
+#       storageAccountName: '$(STORAGEACCOUNT_NAME)'
+#       keyVaultName: '$(KEYVAULT_NAME)'
+#       appInsightsName: '$(APPINSIGHTS_NAME)'
+#       containerRegistryName: '$(CONTAINERREGISTRY_NAME)'
+#       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
 
 - stage: environment_setup
   displayName: 'Environment Setup'
@@ -44,3 +44,4 @@ stages:
       resourcesLocation: '$(LOCATION)'
       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
       amlComputeName: '$(AML_COMPUTE_NAME)'
+      maxFiles: '$(DATASET_MAXFILES)'

@@ -5,6 +5,10 @@
 
 variables:
 
+  # Use case specific
+  - name: DATASET_MAXFILES
+    value: 20
+  
   # General
   - name: ENVIRONMENT
     value: DEV

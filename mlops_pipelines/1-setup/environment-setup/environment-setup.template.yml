@@ -14,20 +14,39 @@ parameters:
   type: string
 - name: amlComputeName
   type: string
+- name: maxFiles
+  type: string
 
 
 jobs:
 
-- job: aml_compute
-  displayName: 'Deploy AML Compute'
-  steps:
-  - task: AzureResourceGroupDeployment@2
-    displayName: 'Deploy AML Compute'
-    inputs:
-      azureSubscription: ${{parameters.serviceConnection}}
-      resourceGroupName: ${{parameters.resourceGroup}}
-      location: ${{parameters.resourcesLocation}}
-      csmFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.template.json'
-      csmParametersFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.parameters.json'
-      overrideParameters: '-workspaceName ${{parameters.amlWorkspaceName}} -clusterName ${{parameters.amlComputeName}}'
+# - job: aml_compute
+#   displayName: 'Deploy AML Compute'
+#   steps:
+#   - task: AzureResourceGroupDeployment@2
+#     displayName: 'Deploy AML Compute'
+#     inputs:
+#       azureSubscription: ${{parameters.serviceConnection}}
+#       resourceGroupName: ${{parameters.resourceGroup}}
+#       location: ${{parameters.resourcesLocation}}
+#       csmFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.template.json'
+#       csmParametersFile: '$(Build.SourcesDirectory)/mlops_pipelines/1-setup/environment-setup/arm-templates/mlcompute.parameters.json'
+#       overrideParameters: '-workspaceName ${{parameters.amlWorkspaceName}} -clusterName ${{parameters.amlComputeName}}'
 
+- job: sample_files
+  displayName: 'Sample Files Setup'
+  steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.7'
+      inputs:
+        versionSpec: 3.7
+    - bash: |
+        # Install dependencies
+        python -m pip install --upgrade pip && python -m pip install azureml-opendatasets
+        # Download sample files
+        datapath=$(python scripts/download_data.py --maxfiles ${{parameters.maxFiles}})
+        # Save datapath variable for next steps
+        echo "##vso[task.setvariable variable=datapath;]$datapath"
+      displayName: 'Download Sample Files'
+      failOnStderr: true
+  
