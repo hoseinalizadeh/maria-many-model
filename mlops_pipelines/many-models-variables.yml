@@ -30,3 +30,5 @@ variables:
   # Azure ML workspace
   - name: AML_COMPUTE_NAME
     value: cpu-compute
+  - name: AML_TRAINING_PIPELINE_NAME
+    value: many-models-training

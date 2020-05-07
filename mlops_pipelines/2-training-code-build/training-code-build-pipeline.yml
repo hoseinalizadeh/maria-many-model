@@ -1,0 +1,50 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+# Pipeline that publishes de AML Pipeline that will train the models
+
+trigger:
+  branches:
+    include:
+    - feature/mlops
+  paths:
+    include:
+    - mlops_pipelines/2-training-code-build/*
+    - scripts/create_training_pipeline.py
+
+variables:
+- group: manymodels-vg
+- template: ../many-models-variables.yml
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: build_training
+  displayName: 'Publish Training AML Pipeline'
+  jobs:
+    - job: build_training
+      displayName: 'Publish Training AML Pipeline'
+      steps:
+
+        - task: UsePythonVersion@0
+          displayName: 'Use Python 3.7'
+          inputs:
+            versionSpec: 3.7
+
+        - task: AzureCLI@1
+          displayName: 'Publish Training AML Pipeline'
+          inputs:
+            azureSubscription: $(SERVICECONNECTION_WORKSPACE)
+            scriptLocation: inlineScript
+            inlineScript: |
+              # Install dependencies
+              python -m pip install --upgrade pip && python -m pip install azureml-sdk[contrib]
+              # Create/update training pipeline
+              python scripts/create_training_pipeline.py --name $(AML_TRAINING_PIPELINE_NAME) \
+                                                         --version $(Build.BuildId) \
+                                                         --dataset $(DATASET_NAME) \
+                                                         --subscription-id $(az account show --query id -o tsv) \
+                                                         --resource-group $(RESOURCE_GROUP) \
+                                                         --workspace-name $(AMLWORKSPACE_NAME)
+
