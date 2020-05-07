@@ -14,6 +14,8 @@
 
 - Create Service Connection with the name set in SERVICECONNECTION_GROUP, setting the subscription and the resource group (which should be already created).
 
+- Make sure the [AML extension](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) is installed in the Azure DevOps organization.
+
 ## 1. Setup Pipeline
 
 - Create the Pipeline as in [here](https://github.com/microsoft/MLOpsPython/blob/master/docs/getting_started.md#create-the-iac-pipeline), selecting branch **``feature/mlops``** and setting the path to [/mlops_pipelines/1-setup/setup-pipeline.yml](1-setup/setup-pipeline.yml).
