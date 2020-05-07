@@ -43,7 +43,7 @@ stages:
               # Create/update training pipeline
               python scripts/create_training_pipeline.py --name $(AML_TRAINING_PIPELINE_NAME) \
                                                          --version $(Build.BuildId) \
-                                                         --dataset $(DATASET_NAME) \
+                                                         --dataset $(AML_DATASET_NAME) \
                                                          --subscription-id $(az account show --query id -o tsv) \
                                                          --resource-group $(RESOURCE_GROUP) \
                                                          --workspace-name $(AMLWORKSPACE_NAME)

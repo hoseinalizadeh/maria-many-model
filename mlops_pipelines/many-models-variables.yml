@@ -8,8 +8,6 @@ variables:
   # Use case specific
   - name: DATASET_MAXFILES
     value: 20
-  - name: DATASET_NAME
-    value: oj_sales_data_20
   
   # General
   - name: ENVIRONMENT
@@ -30,5 +28,7 @@ variables:
   # Azure ML workspace
   - name: AML_COMPUTE_NAME
     value: cpu-compute
+  - name: AML_DATASET_NAME
+    value: oj_sales_data_$(DATASET_MAXFILES)
   - name: AML_TRAINING_PIPELINE_NAME
     value: many-models-training

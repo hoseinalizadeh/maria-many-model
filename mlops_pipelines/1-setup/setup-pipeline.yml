@@ -44,6 +44,6 @@ stages:
       resourcesLocation: '$(LOCATION)'
       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
       amlComputeName: '$(AML_COMPUTE_NAME)'
-      amlDatasetName: '$(DATASET_NAME)'
+      amlDatasetName: '$(AML_DATASET_NAME)'
       maxFiles: '$(DATASET_MAXFILES)'
       
