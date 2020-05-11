@@ -44,7 +44,9 @@ def run(rawdata):
         model_name = '{t}_{s}_{b}'.format(t=metadata['model_type'], s=metadata['store'], b=metadata['brand'])
         model = model_dict[model_name]
     except KeyError:
-        return AMLResponse('Model not found for store {} and brand {}'.format(metadata['store'], metadata['brand']), 400)
+        return AMLResponse('Model not found for store {s} and brand {b} of type {t}'.format(
+            s=metadata['store'], b=metadata['brand'], t=metadata['model_type']
+        ), 400)
     
 
     # Forecasting
