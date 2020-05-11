@@ -48,10 +48,14 @@ stages:
   jobs:
   - template: deploy-models-aci/deploy-models-aci.template.yml
     parameters:
+      environment: '$(ENVIRONMENT)'
       serviceConnection: '$(SERVICECONNECTION_WORKSPACE)'
       resourceGroup: '$(RESOURCE_GROUP)'
       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
       groupingTags: '$(AML_MODEL_GROUPING_TAGS)'
+      routingModelName: '$(AML_ROUTING_MODEL_NAME)'
+      routingModelTag: '$(AML_ROUTING_MODEL_TAG)'
+      routingServiceName: '$(AML_ROUTING_WEBSERVICE)'
 
 # - stage: deploy_models-aks
 #   displayName: 'Deploy Models to AKS'

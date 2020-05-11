@@ -4,6 +4,8 @@
 # Azure Pipeline Template for deploying models to ACI
 
 parameters:
+- name: environment
+  type: string
 - name: serviceConnection
   type: string
 - name: resourceGroup
@@ -11,6 +13,12 @@ parameters:
 - name: amlWorkspaceName
   type: string
 - name: groupingTags
+  type: string
+- name: routingModelName
+  type: string
+- name: routingModelTag
+  type: string
+- name: routingServiceName
   type: string
 
 
@@ -20,27 +28,76 @@ jobs:
   displayName: 'Deploy Models'
   steps:
 
-        - task: UsePythonVersion@0
-          displayName: 'Use Python 3.7'
-          inputs:
-            versionSpec: 3.7
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
 
-        - task: AzureCLI@1
-          displayName: 'Deploy Models in Groups'
-          inputs:
-            azureSubscription: $(SERVICECONNECTION_WORKSPACE)
-            scriptLocation: inlineScript
-            inlineScript: |
-              # Install dependencies
-              python -m pip install --upgrade pip && python -m pip install joblib azureml-sdk
-              # Create/update training pipeline
-              python scripts/deploy_grouped_models.py --grouping-tags ${{parameters.groupingTags}} \
-                                                      --endpoints-path 'endpoints.pkl' \
-                                                      --subscription-id $(az account show --query id -o tsv) \
-                                                      --resource-group $(RESOURCE_GROUP) \
-                                                      --workspace-name $(AMLWORKSPACE_NAME)
+  - task: AzureCLI@1
+    displayName: 'Deploy Models in Groups'
+    inputs:
+      azureSubscription: ${{parameters.serviceConnection}}
+      scriptLocation: inlineScript
+      inlineScript: |
+        # Install dependencies
+        python -m pip install --upgrade pip && python -m pip install joblib azureml-sdk
+        # Create/update training pipeline
+        python scripts/deploy_grouped_models.py --grouping-tags ${{parameters.groupingTags}} \
+                                                --endpoints-path 'endpoints.pkl' \
+                                                --subscription-id $(az account show --query id -o tsv) \
+                                                --resource-group $(RESOURCE_GROUP) \
+                                                --workspace-name $(AMLWORKSPACE_NAME)
 
-        - publish: 'endpoints.pkl'
-          artifact: endpointsartifact
-          displayName: 'Publish Endpoints Artifact'
-                             
+  - publish: 'endpoints.pkl'
+    artifact: endpointsartifact
+    displayName: 'Publish Endpoints Artifact'
+
+- job: routing_model
+  displayName: 'Register Routing Model'
+  dependsOn: deploy_models
+  steps:
+
+  - download: current
+    artifact: endpointsartifact
+
+  - task: AzureCLI@1
+    displayName: 'Register Routing Model'
+    inputs:
+      azureSubscription: ${{parameters.serviceConnection}}
+      scriptLocation: inlineScript
+      inlineScript: |
+        # Install ML extension
+        az extension add -n azure-cli-ml
+        # Set default workspace
+        az ml folder attach -w ${{parameters.amlWorkspaceName}} -g ${{parameters.resourceGroup}}
+        # Register model
+        az ml model register -n ${{parameters.routingModelName}} \
+                              --model-path '$(Pipeline.Workspace)/endpointsartifact/endpoints.pkl' \
+                              --tag '${{parameters.routingModelTag}}' \
+                              -t routing_model.json
+
+  - publish: 'routing_model.json'
+    artifact: routingmodelartifact
+    displayName: 'Publish Routing Model Artifact'
+
+
+- deployment: routing_webservice
+  displayName: 'Deploy Routing Webservice'
+  dependsOn: routing_model
+  environment: ${{parameters.environment}}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+
+        - download: current
+          artifact: routingmodelartifact
+
+        - task: ms-air-aiagility.vss-services-azureml.azureml-model-deploy-task.AMLModelDeploy@0
+          displayName: 'Deploy Routing Model to ACI'
+          inputs:
+            azureSubscription: ${{parameters.serviceConnection}}
+            inferencePath: '$(Pipeline.Workspace)/routingmodelartifact/routing_model.json'
+            deploymentName: '${{parameters.routingServiceName}}'
+            deployConfig: '$(Build.SourcesDirectory)/mlops_pipelines/3-modeling/deploy-models-aci/deployment-aci.json'
+            overwriteExistingDeployment: true

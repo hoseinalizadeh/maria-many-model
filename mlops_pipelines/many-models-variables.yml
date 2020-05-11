@@ -30,7 +30,15 @@ variables:
     value: cpu-compute
   - name: AML_DATASET_NAME
     value: oj_sales_data_$(DATASET_MAXFILES)
-  - name: AML_TRAINING_PIPELINE_NAME
-    value: many-models-training
   - name: AML_MODEL_GROUPING_TAGS
     value: Store
+
+  # Internal
+  - name: AML_TRAINING_PIPELINE_NAME
+    value: many-models-training
+  - name: AML_ROUTING_MODEL_NAME
+    value: deployed_models_endpoints
+  - name: AML_ROUTING_MODEL_TAG
+    value: ModelType=_meta_
+  - name: AML_ROUTING_WEBSERVICE
+    value: routing-manymodels
