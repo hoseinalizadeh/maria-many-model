@@ -33,17 +33,27 @@ stages:
 #   jobs:
 #   - template: update-data/update-data.template.yml
 
-- stage: run_training
-  displayName: 'Run Model Training'
+# - stage: run_training
+#   displayName: 'Run Model Training'
+#   jobs:
+#   - template: run-training/run-training.template.yml
+#     parameters:
+#       serviceConnection: '$(SERVICECONNECTION_WORKSPACE)'
+#       resourceGroup: '$(RESOURCE_GROUP)'
+#       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
+#       trainingPipelineName: '$(AML_TRAINING_PIPELINE_NAME)'
+
+- stage: deploy_models_aci
+  displayName: 'Deploy Models to ACI'
   jobs:
-  - template: run-training/run-training.template.yml
+  - template: deploy-models-aci/deploy-models-aci.template.yml
     parameters:
       serviceConnection: '$(SERVICECONNECTION_WORKSPACE)'
       resourceGroup: '$(RESOURCE_GROUP)'
       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
-      trainingPipelineName: '$(AML_TRAINING_PIPELINE_NAME)'
+      groupingTags: '$(AML_MODEL_GROUPING_TAGS)'
 
 # - stage: deploy_models-aks
-#   displayName: 'Deploy Models'
+#   displayName: 'Deploy Models to AKS'
 #   jobs:
 #   - template: deploy-models-aks/deploy-models-aks.template.yml

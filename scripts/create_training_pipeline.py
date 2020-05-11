@@ -62,7 +62,7 @@ def get_parallel_run_config(ws, dataset_name, compute_name="cpu-compute", proces
     compute = AmlCompute(ws, compute_name)
     
     # Set up ParallelRunStep configuration
-    scripts_dir = "scripts" #pathlib.Path(__file__).parent.absolute().__str__()
+    scripts_dir = pathlib.Path(__file__).parent.absolute().__str__()
     parallel_run_config = ParallelRunConfig(
         source_directory=scripts_dir,
         entry_script='train.py',

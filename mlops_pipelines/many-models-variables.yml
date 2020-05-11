@@ -32,3 +32,5 @@ variables:
     value: oj_sales_data_$(DATASET_MAXFILES)
   - name: AML_TRAINING_PIPELINE_NAME
     value: many-models-training
+  - name: AML_MODEL_GROUPING_TAGS
+    value: Store
