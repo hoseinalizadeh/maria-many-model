@@ -103,5 +103,5 @@ jobs:
             azureSubscription: ${{parameters.serviceConnection}}
             inferencePath: '$(Pipeline.Workspace)/routingmodelartifact/routing_model.json'
             deploymentName: '${{parameters.routingServiceName}}'
-            deployConfig: '$(Build.SourcesDirectory)/mlops_pipelines/3-modeling/deploy-models-aci/deployment-aci.json'
+            deployConfig: '$(Build.SourcesDirectory)/mlops_pipelines/3-modeling/deploy-models-aci/deployment-confg-aci.yml'
             overwriteExistingDeployment: true

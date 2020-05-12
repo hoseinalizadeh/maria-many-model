@@ -7,7 +7,7 @@ variables:
 
   # Use case specific
   - name: DATASET_MAXFILES
-    value: 20
+    value: 3
   
   # General
   - name: ENVIRONMENT
