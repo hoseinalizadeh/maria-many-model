@@ -54,7 +54,8 @@ stages:
       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
       groupingTags: '$(AML_MODEL_GROUPING_TAGS)'
       routingModelName: '$(AML_ROUTING_MODEL_NAME)'
-      routingModelTag: '$(AML_ROUTING_MODEL_TAG)'
+      routingModelTagName: '$(AML_ROUTING_MODEL_TAG_NAME)'
+      routingModelTagValue: '$(AML_ROUTING_MODEL_TAG_VALUE)'
       routingServiceName: '$(AML_ROUTING_WEBSERVICE)'
 
 # - stage: deploy_models-aks

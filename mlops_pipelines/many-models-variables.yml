@@ -38,7 +38,9 @@ variables:
     value: many-models-training
   - name: AML_ROUTING_MODEL_NAME
     value: deployed_models_endpoints
-  - name: AML_ROUTING_MODEL_TAG
-    value: ModelType=_meta_
+  - name: AML_ROUTING_MODEL_TAG_NAME
+    value: ModelType
+  - name: AML_ROUTING_MODEL_TAG_VALUE
+    value: _meta_
   - name: AML_ROUTING_WEBSERVICE
     value: routing-manymodels

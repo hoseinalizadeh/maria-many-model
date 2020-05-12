@@ -16,7 +16,9 @@ parameters:
   type: string
 - name: routingModelName
   type: string
-- name: routingModelTag
+- name: routingModelTagName
+  type: string
+- name: routingModelTagValue
   type: string
 - name: routingServiceName
   type: string
@@ -42,8 +44,10 @@ jobs:
         # Install dependencies
         python -m pip install --upgrade pip && python -m pip install joblib azureml-sdk
         # Create/update training pipeline
-        python scripts/deploy_grouped_models.py --grouping-tags ${{parameters.groupingTags}} \
+        python scripts/deploy_grouped_models.py --grouping-tags '${{parameters.groupingTags}}' \
                                                 --endpoints-path 'endpoints.pkl' \
+                                                --routing-model-tag-name '${{parameters.routingModelTagName}}' \
+                                                --routing-model-tag-value '${{parameters.routingModelTagValue}}' \
                                                 --subscription-id $(az account show --query id -o tsv) \
                                                 --resource-group $(RESOURCE_GROUP) \
                                                 --workspace-name $(AMLWORKSPACE_NAME)
@@ -73,7 +77,7 @@ jobs:
         # Register model
         az ml model register -n ${{parameters.routingModelName}} \
                               --model-path '$(Pipeline.Workspace)/endpointsartifact/endpoints.pkl' \
-                              --tag '${{parameters.routingModelTag}}' \
+                              --tag '${{parameters.routingModelTagName}}=${{parameters.routingModelTagValue}}' \
                               -t routing_model.json
 
   - publish: 'routing_model.json'
