@@ -1,9 +1,0 @@
-entryScript: ../../../scripts/routing_webservice.py
-runtime: python
-condaFile: ../../../scripts/routing_webservice.conda.yml
-extraDockerfileSteps:
-schemaFile:
-sourceDirectory:
-enableGpu: False
-baseImage:
-baseImageRegistry:

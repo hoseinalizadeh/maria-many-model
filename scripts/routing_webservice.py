@@ -14,7 +14,6 @@ def init():
     
     models_root_path = os.getenv('AZUREML_MODEL_DIR') 
     models_files = [os.path.join(path, f) for path,dirs,files in os.walk(models_root_path) for f in files]
-    print(models_files)
     if len(models_files) > 1:
         raise RuntimeError('Found more than one model')
 
