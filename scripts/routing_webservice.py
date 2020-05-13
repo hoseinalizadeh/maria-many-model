@@ -11,8 +11,14 @@ from azureml.contrib.services.aml_response import AMLResponse
 
 def init(): 
     global service_dict
-    dict_path = Model.get_model_path('models_deployed')
-    service_dict = joblib.load(dict_path)
+    
+    models_root_path = os.getenv('AZUREML_MODEL_DIR') 
+    models_files = [os.path.join(path, f) for path,dirs,files in os.walk(models_root_path) for f in files]
+    print(models_files)
+    if len(models_files) > 1:
+        raise RuntimeError('Found more than one model')
+
+    service_dict = joblib.load(models_files[0])
 
 
 # Rawdata example:

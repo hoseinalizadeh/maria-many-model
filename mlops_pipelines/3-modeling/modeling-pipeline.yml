@@ -48,7 +48,6 @@ stages:
   jobs:
   - template: deploy-models-aci/deploy-models-aci.template.yml
     parameters:
-      environment: '$(ENVIRONMENT)'
       serviceConnection: '$(SERVICECONNECTION_WORKSPACE)'
       resourceGroup: '$(RESOURCE_GROUP)'
       amlWorkspaceName: '$(AMLWORKSPACE_NAME)'
