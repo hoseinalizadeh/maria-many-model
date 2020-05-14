@@ -10,7 +10,7 @@ from azureml.pipeline.core import Pipeline, PipelineData, PublishedPipeline
 from azureml.contrib.pipeline.steps import ParallelRunConfig, ParallelRunStep
 
 
-def create_training_pipeline(ws, pipeline_name, pipeline_version, dataset_name):
+def create_training_pipeline(ws, pipeline_name, pipeline_version, dataset_name, compute_name):
 
     # Get input dataset
     dataset = Dataset.get_by_name(ws, name=dataset_name)
@@ -21,9 +21,9 @@ def create_training_pipeline(ws, pipeline_name, pipeline_version, dataset_name):
     output_dir = PipelineData(name='training_output', datastore=datastore)
 
     # Set up ParallelRunStep
-    parallel_run_config = get_parallel_run_config(ws, dataset_name)
+    parallel_run_config = get_parallel_run_config(ws, dataset_name, compute_name)
     parallel_run_step = ParallelRunStep(
-        name='many-models-training',
+        name='many-models-parallel-training',
         parallel_run_config=parallel_run_config,
         inputs=[dataset_input],
         output=output_dir,
@@ -53,7 +53,7 @@ def create_training_pipeline(ws, pipeline_name, pipeline_version, dataset_name):
     return published_pipeline.id
 
 
-def get_parallel_run_config(ws, dataset_name, compute_name="cpu-compute", processes_per_node=8, node_count=3, timeout=300):
+def get_parallel_run_config(ws, dataset_name, compute_name, processes_per_node=8, node_count=3, timeout=300):
     
     # Configure environment for ParallelRunStep
     train_env = Environment(name="many_models_environment")
@@ -95,6 +95,7 @@ def parse_args(args=None):
     parser.add_argument("--name", required=True, type=str)
     parser.add_argument("--version", required=True, type=str)
     parser.add_argument("--dataset", type=str, default='oj_sales_data')
+    parser.add_argument("--compute", type=str, default='cpu-compute')
     args_parsed = parser.parse_args(args)
     return args_parsed
 
@@ -109,5 +110,11 @@ if __name__ == "__main__":
         resource_group=args.resource_group
     )
 
-    pipeline_id = create_training_pipeline(ws, pipeline_name=args.name, pipeline_version=args.version, dataset_name=args.dataset)
+    pipeline_id = create_training_pipeline(
+        ws, 
+        pipeline_name=args.name, 
+        pipeline_version=args.version, 
+        dataset_name=args.dataset,
+        compute_name=args.compute
+    )
     print('Training pipeline {} version {} published with ID {}'.format(args.name, args.version, pipeline_id))

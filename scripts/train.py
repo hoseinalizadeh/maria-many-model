@@ -30,8 +30,11 @@ def init():
 
 
 def run(input_data):
-    # 1.0 Set up output directory and the results list
+
+    # 1.0 Set up output directories and the results list
     os.makedirs('./outputs', exist_ok=True)
+    dir_allmodels = os.path.join('./outputs', 'all_models')
+    os.makedirs(dir_allmodels, exist_ok=True)
     result_list = []
 
     # 2.0 Loop through each file in the batch
@@ -84,9 +87,14 @@ def run(input_data):
                     
         tags_dict = {
             'Store': store_name, 'Brand': brand_name, 'ModelType': args.model_type,
-            'StoreGroup': store_name[:-2] + 'XX'
+            'StoreGroup10': store_name[:-1] + 'X', 'StoreGroup100': store_name[:-2] + 'XX'
         }
         current_run.register_model(model_path = model_name, model_name = model_name, model_framework = args.model_type, tags = tags_dict)
+
+        model_info = {'name': model_name, 'tags': tags_dict}
+        model_info_file = os.path.join(dir_allmodels, '{}.info'.format(model_name))
+        joblib.dump(model_info, filename=model_info_file)
+        current_run.upload_file(model_info_file, model_info_file)
 
         # 8.0 Make predictions on test set
         test['Predictions'] = model.predict(X_test)
