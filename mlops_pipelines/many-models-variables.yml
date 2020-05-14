@@ -27,7 +27,7 @@ variables:
   - name: AML_DATASET_NAME
     value: oj_sales_data_$(DATASET_MAXFILES)
   - name: AML_MODEL_GROUPING_TAGS
-    value: Store
+    value: StoreGroup
 
   # Internal
   - name: AML_TRAINING_PIPELINE_NAME
