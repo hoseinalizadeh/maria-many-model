@@ -10,9 +10,9 @@ from azureml.core.model import InferenceConfig
 from azureml.core.webservice import AciWebservice
 
 
-def deploy_model_groups(ws, grouping_tags=None, exclude=[]):
+def deploy_model_groups(ws, nmodels, grouping_tags=None, exclude=[]):
 
-    grouped_models = get_grouped_models(grouping_tags, exclude=exclude)
+    grouped_models = get_grouped_models(nmodels, grouping_tags, exclude=exclude)
     
     deployment_config = get_deployment_config()
 
@@ -28,14 +28,23 @@ def deploy_model_groups(ws, grouping_tags=None, exclude=[]):
     return endpoints
 
 
-def get_grouped_models(grouping_tags=None, exclude=[]):
+def get_grouped_models(nmodels, grouping_tags=None, exclude=[]):
     
     # Get all models registered in the workspace
-    all_models = Model.list(ws, latest=True)
+    # all_models = Model.list(ws, latest=True)
     
+    #FIXME parallel deployment
+    all_stores = ['Store{}'.format(i) for i in range(138, 4129)]
+    all_brands = ['dominicks', 'minute.maid', 'tropicana']
+    all_models = [f'lr_{store}_{brand}' for store in all_stores for brand in all_brands]
+    
+    print(nmodels)
+    models_todeploy = sorted(all_models)[:nmodels]
+    models_todeploy = [Model(ws, name) for name in models_todeploy]
+
     # Group models by tags
     grouped_models = {}
-    for m in all_models:
+    for m in models_todeploy:
         # Exclude models that follow conditions (routing meta-model)
         if any(m.tags[t] == v for t,v in exclude):
             continue
@@ -96,6 +105,7 @@ def parse_args(args=None):
     parser.add_argument('--subscription-id', required=True, type=str)
     parser.add_argument('--resource-group', required=True, type=str)
     parser.add_argument('--workspace-name', required=True, type=str)
+    parser.add_argument('--nmodels', required=True, type=int)
     parser.add_argument("--grouping-tags", type=lambda str: [t for t in str.split(',') if t])
     parser.add_argument("--routing-model-tag-name", type=str, default='ModelType')
     parser.add_argument("--routing-model-tag-value", type=str, default='_meta_')
@@ -116,5 +126,5 @@ if __name__ == "__main__":
 
     routing_model_tags = [(args.routing_model_tag_name, args.routing_model_tag_value)]
 
-    endpoints = deploy_model_groups(ws, grouping_tags=args.grouping_tags, exclude=routing_model_tags)
+    endpoints = deploy_model_groups(ws, nmodels=args.nmodels, grouping_tags=args.grouping_tags, exclude=routing_model_tags)
     joblib.dump(endpoints, args.endpoints_path)

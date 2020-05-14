@@ -26,6 +26,7 @@ jobs:
 
 - job: deploy_models
   displayName: 'Deploy Models'
+  timeoutInMinutes: 0
   steps:
 
     - task: UsePythonVersion@0
@@ -44,6 +45,7 @@ jobs:
           # Create/update training pipeline
           python scripts/deploy_grouped_models.py --grouping-tags '${{parameters.groupingTags}}' \
                                                   --endpoints-path 'endpoints.pkl' \
+                                                  --nmodels $(DATASET_MAXFILES) \
                                                   --routing-model-tag-name '${{parameters.routingModelTagName}}' \
                                                   --routing-model-tag-value '${{parameters.routingModelTagValue}}' \
                                                   --subscription-id $(az account show --query id -o tsv) \
