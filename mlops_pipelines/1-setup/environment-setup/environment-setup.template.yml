@@ -60,14 +60,18 @@ jobs:
         azureSubscription: ${{parameters.serviceConnection}}
         scriptLocation: inlineScript
         inlineScript: |
+          workspace_params="--workspace-name ${{parameters.amlWorkspaceName}} --resource-group ${{parameters.resourceGroup}}"
           # Install ML extension
           az extension add -n azure-cli-ml
-          # Set default workspace
-          az ml folder attach -w ${{parameters.amlWorkspaceName}} -g ${{parameters.resourceGroup}}
           # Get default datastore
-          datastore=$(az ml datastore show-default --query name -o tsv)
+          datastore=$(az ml datastore show-default $workspace_params --query name -o tsv)
           # Upload files
-          az ml datastore upload --name $datastore --src-path $(download_files.datapath) --target-path $(download_files.datapath) --overwrite true
+          az ml datastore upload --name $datastore \
+                                 --src-path $(download_files.datapath) \
+                                 --target-path $(download_files.datapath) \
+                                 --overwrite true \
+                                 $workspace_params                               
+
 
 - job: register_dataset
   displayName: 'Register Dataset'

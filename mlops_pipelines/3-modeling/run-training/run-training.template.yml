@@ -29,10 +29,9 @@ jobs:
         inlineScript: |
           # Install ML extension
           az extension add -n azure-cli-ml
-          # Set default workspace
-          az ml folder attach -w ${{parameters.amlWorkspaceName}} -g ${{parameters.resourceGroup}}
           # Get training pipeline ID
-          pipeline_id=$(az ml pipeline list --query "[?Name == '${{parameters.trainingPipelineName}}'].Id" -o tsv)
+          workspace_params="--workspace-name ${{parameters.amlWorkspaceName}} --resource-group ${{parameters.resourceGroup}}"
+          pipeline_id=$(az ml pipeline list $workspace_params --query "[?Name == '${{parameters.trainingPipelineName}}'].Id" -o tsv)
           echo "##vso[task.setvariable variable=pipeline_id;isOutput=true;]$pipeline_id"
 
 - job: run_training
