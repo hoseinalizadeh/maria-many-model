@@ -6,7 +6,7 @@ import argparse
 from azureml.core import Workspace, Experiment, Dataset, Environment
 from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.compute import AmlCompute
-from azureml.pipeline.core import Pipeline, PipelineData
+from azureml.pipeline.core import Pipeline, PipelineData, PublishedPipeline
 from azureml.contrib.pipeline.steps import ParallelRunConfig, ParallelRunStep
 
 
@@ -41,11 +41,13 @@ def create_training_pipeline(ws, pipeline_name, pipeline_version, dataset_name):
     train_pipeline = Pipeline(workspace=ws, steps=[parallel_run_step])
     train_pipeline.validate()
     
+    # Publish it and replace old pipeline
+    disable_old_pipelines(ws, pipeline_name)
     published_pipeline = train_pipeline.publish(
         name=pipeline_name,
         description="Many Models training/retraining pipeline",
         version=pipeline_version,
-        continue_on_step_failure = False
+        continue_on_step_failure=False
     )
 
     return published_pipeline.id
@@ -77,6 +79,12 @@ def get_parallel_run_config(ws, dataset_name, compute_name="cpu-compute", proces
     )
     
     return parallel_run_config
+
+
+def disable_old_pipelines(ws, pipeline_name):
+    for pipeline in PublishedPipeline.list(ws):
+        if pipeline.name == pipeline_name:
+            pipeline.disable()
 
 
 def parse_args(args=None):
