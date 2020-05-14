@@ -11,6 +11,7 @@ trigger:
     include:
     - mlops_pipelines/2-training-code-build/*
     - scripts/create_training_pipeline.py
+    - scripts/train.py
 
 variables:
 - group: manymodels-vg
