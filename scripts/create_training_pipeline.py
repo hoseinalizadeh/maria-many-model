@@ -55,7 +55,7 @@ def get_parallel_run_config(ws, dataset_name, compute_name="cpu-compute", proces
     
     # Configure environment for ParallelRunStep
     train_env = Environment(name="many_models_environment")
-    train_conda_deps = CondaDependencies.create(pip_packages=['sklearn'])
+    train_conda_deps = CondaDependencies.create(pip_packages=['joblib', 'sklearn'])
     train_env.python.conda_dependencies = train_conda_deps
     
     # Get the compute target
