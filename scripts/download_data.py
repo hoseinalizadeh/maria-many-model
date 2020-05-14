@@ -36,6 +36,8 @@ def parse_args(args=None):
             suffix = '_{}'.format(args_parsed.maxfiles) if args_parsed.maxfiles else ''
         )
 
+    args_parsed.maxfiles = None if args_parsed.maxfiles <= 0 else args_parsed.maxfiles
+
     return args_parsed
 
 

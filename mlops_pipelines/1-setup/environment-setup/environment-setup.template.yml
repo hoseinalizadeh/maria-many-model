@@ -54,10 +54,6 @@ jobs:
       displayName: 'Download Sample Files'
       failOnStderr: true
     
-    - bash: | 
-        echo Datapath: $(download_files.datapath)
-      name: echotask
-    
     - task: AzureCLI@1
       displayName: 'Upload files to AML datastore'
       inputs:
