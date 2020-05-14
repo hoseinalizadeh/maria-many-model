@@ -4,10 +4,6 @@
 # Definition of common runtime environment variables
 
 variables:
-
-  # Use case specific
-  - name: DATASET_MAXFILES
-    value: 3
   
   # General
   - name: ENVIRONMENT

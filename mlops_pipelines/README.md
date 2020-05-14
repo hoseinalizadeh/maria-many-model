@@ -6,6 +6,7 @@
 
 | Variable Name               | Short description |
 | --------------------------- | ----------------- |
+| DATASET_MAXFILES            | Number of sample files to use (1 file = 1 model) |
 | NAMESPACE                   | Unique naming prefix for created resources |
 | LOCATION                    | [Azure location](https://azure.microsoft.com/en-us/global-infrastructure/locations/), no spaces |
 | RESOURCE_GROUP              | Azure Resource Group name. Resource group should be already created |
@@ -26,6 +27,6 @@
 
 - Create the pipeline selecting branch **``feature/mlops``** and setting the path to [/mlops_pipelines/2-training-code-build/training-code-build-pipeline.yml](2-training-code-build/training-code-build-pipeline.yml).
 
-## 3. Modeling Pipeline (in progress - training for now)
+## 3. Modeling Pipeline
 
 - Create the pipeline selecting branch **``feature/mlops``** and setting the path to [/mlops_pipelines/3-modeling/modeling-pipeline.yml](3-modeling/modeling-pipeline.yml).
