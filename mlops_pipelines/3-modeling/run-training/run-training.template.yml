@@ -37,6 +37,7 @@ jobs:
 - job: run_training
   displayName: 'Run Training'
   pool: server
+  timeoutInMinutes: 0
   dependsOn: pipeline_id
   variables: 
     pipeline_id: $[ dependencies.pipeline_id.outputs['get_pipeline_id.pipeline_id'] ]
