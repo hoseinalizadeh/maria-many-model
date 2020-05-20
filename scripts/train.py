@@ -8,7 +8,7 @@ import os
 import argparse
 import datetime
 from datetime import timedelta
-#from sklearn.externals import joblib
+from sklearn.externals import joblib
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.linear_model import LinearRegression 
 
@@ -77,10 +77,10 @@ def run(input_data):
         model.fit(X_train, y_train)
 
         # 6.0 Save the model
-        #joblib.dump(model, filename=os.path.join('./outputs/', model_name))
+        joblib.dump(model, filename=os.path.join('./outputs/', model_name))
 
         # 7.0 Register the model to the workspace
-        #current_run.upload_file(model_name, os.path.join('./outputs/', model_name))
+        current_run.upload_file(model_name, os.path.join('./outputs/', model_name))
                     
         tags_dict = {'Store': store_name, 'Brand': brand_name, 'ModelType': args.model_type}
         current_run.register_model(model_path = model_name, model_name = model_name, model_framework = args.model_type, tags = tags_dict)
